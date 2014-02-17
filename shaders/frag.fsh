@@ -1,6 +1,4 @@
 varying vec2 vUv;
-varying vec3 vNormal;
-
 uniform sampler2D depth;
 
 void main() {
@@ -10,6 +8,7 @@ void main() {
   vec3 n = vec3(-(dx.x - rgb.x) / 0.005, -(dy.x - rgb.x) / 0.005, 0.1);
   float len = sqrt(dot(n, n));
   n.z /= len;
+  float d = rgb.x;
   vec2 uv = vec2(vUv.x, vUv.y + 0.5);
   rgb = texture2D(depth, uv);
   
@@ -20,6 +19,9 @@ void main() {
     alpha = 0.0;
   } else {
     alpha = 1.0;
+  }
+  if (d >= 0.98) {
+    alpha = 0.5;
   }
   gl_FragColor = vec4(n.z * rgb.x, n.z * rgb.y, n.z * rgb.z, alpha);
 }
