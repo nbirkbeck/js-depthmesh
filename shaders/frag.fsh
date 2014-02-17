@@ -2,7 +2,6 @@ varying vec2 vUv;
 varying vec3 vNormal;
 
 uniform sampler2D depth;
-uniform sampler2D color;
 
 void main() {
   vec4 rgb = texture2D(depth, vUv);
@@ -11,7 +10,8 @@ void main() {
   vec3 n = vec3(-(dx.x - rgb.x) / 0.005, -(dy.x - rgb.x) / 0.005, 0.1);
   float len = sqrt(dot(n, n));
   n.z /= len;
-  rgb = texture2D(color, vUv);
+  vec2 uv = vec2(vUv.x, vUv.y + 0.5);
+  rgb = texture2D(depth, uv);
   
   //  rgb = vec4(dx.x - rgb.x, dy.x - rgb.x, 1.0, 1.0);
   float alpha = n.z;
