@@ -1,15 +1,137 @@
 <html>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+  <script src="http://closure-library.googlecode.com/git/closure/goog/base.js"></script>
+  <script src="http://closure-library.googlecode.com/git/closure/goog/events/events.js"></script>
+  <script src="http://closure-library.googlecode.com/git/closure/goog/style/style.js"></script>
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r61/three.js"></script>
+  <link rel="stylesheet" text="text/css" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 <style>
 #vid {
   width: 800px;
   height: 32px;
 }
+.main {
+  width: 800px;
+  height: 600px;
+  float: left;
+}
+.controls {
+  padding: 10px;
+  font-size: 10pt;
+  float: left;
+  width: 220px;
+  height: 600px;
+}
+.controls-content-no {
+  height: 500px;
+}
+#depth-map, #shaded, #background {
+  width: 250px;
+}
+#num-vertices, #alpha, #normal {
+  width: 125px;
+  float: right;
+}
+.ui-button-text {
+  font-size: 9pt;
+}
 </style>
 
 <body>
-  <div id='container' title='Basis images'></div>
-  <video id='vid' src='video.webm' controls loop></video>
+  <div class='main'>
+    <div id='container' title='Depth map demo'></div>
+    <video id='vid' src='video.webm' controls loop></video>
+  </div>
+  <div class='controls'>
+    <h3> Geometry </h3>
+    <div class='controls-content'>
+      <p>
+        <div>
+          <span>Num vertices:</span><div id="num-vertices"></div>
+        </div>
+        <br>
+        <input type="checkbox" id="wireframe"><label for="wireframe">Wireframe</label>
+      </p>
+    </div>
+    <h3> Rendering </h3>
+    <div class='controls-content'>
+      <p>
+        <input type="checkbox" id="depth-map"><label for="depth-map">Show depth map</label>
+        <input type="checkbox" id="shaded"><label for="shaded">Shaded</label>
+        <input type="checkbox" id="background" checked><label for="background">Show background</label><br>
+        <div>
+          <span>Alpha thresh:</span><div id="alpha"></div>
+        </div>
+      </p>
+    </div>
+    <h3> Threed </h3>
+    <p>
+      <div>
+        <span>Rotate:</span><div id="rotate"></div>
+      </div>
+      <input type="button" id="pop" value="Pop">
+    </p>
+  </div>
+  <script src='calib.js'></script>
   <script src='depthmesh.js'></script>
+<script>
+  var containerEl = container;
+  var videoEl = vid;
+  var demo = new DepthMeshDemo(containerEl, videoEl, calib);
+
+  $(function() {
+    $("#num-vertices").slider({
+      min: 10, 
+      max: 200, 
+      step: 5,
+      value: DepthMeshDemo.DEFAULT_NUM_VERTICES,
+      change: function(event, ui) {
+        demo.createPlane(ui.value);
+      }
+    });
+    $("#wireframe").button().change(function(event) {
+       demo.setWireframe($(this).is(":checked"));
+    });
+
+    $("#depth-map").button().change(function() {
+       demo.setShowDepthMap($(this).is(":checked"));
+    });
+    $("#alpha").slider({
+      min: 1,
+      step: 1,
+      max: 100,
+      value: 2,
+      change: function(event, ui) {
+        demo.setAlphaThresh(Math.log(ui.value) / 10);
+      }
+    });
+
+    $("#shaded").button().change(function() {
+      demo.setShaded($(this).is(":checked"));
+    });
+   
+    $("#background").button({checked: true}).attr('checked', true).change(function() {
+      demo.setShowBackground($(this).is(":checked"));
+    }).prop('checked', true);
+    $("#background").attr('checked', true);
+
+    $("#pop").button().click(function() {
+      demo.pop();
+    });
+
+    $("#rotate").slider({
+      min: -1,
+      max: 1,
+      step: 0.01,
+      value: 0.0,
+      change: function(event, ui) {
+        demo.setRotation(ui.value);
+      }
+    });
+    $(".controls").show();
+  });
+    
+</script>
+
 </html>
