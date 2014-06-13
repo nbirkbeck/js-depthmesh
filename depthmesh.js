@@ -1,4 +1,8 @@
+goog.provide('DepthMeshDemo');
 
+goog.require('goog.array');
+goog.require('goog.events');
+goog.require('goog.style');
 
 
 /**
